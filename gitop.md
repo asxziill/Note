@@ -34,4 +34,20 @@ git config --global init.defaultBranch main
 git fetch、git pull：提取远程仓仓库
 
 git pull(可加--rebase) [仓库] [分支名]
+
+
+git log:查看历史记录
+commit hash值 (当前版本位置)
+Author: 作者
+Date: 时间
+备注
+git log --pretty=oneline 简洁
+
+git reset --hard HEAD^ 版本回退，几个^回退几个版本
+git reset --hard HEAD~n版本回退n个
+git reset --hard [索引值]
+
+git reset --soft  ：1.仅在本地版本库移动指针。
+git reset --mixed : 1.移动本地版本库的指针；2.重置暂存区。（默认的参数）
+git reset --hard  : 1.移动本地版本库的指针；2.重置暂存区；3.重置工作区。
 ```
