@@ -39,16 +39,38 @@
 + capacity_ LRU的容量(一定要初始化)
 + mutex_ 互斥锁
 + usage_ 使用总花费
-+ lru_ 双向链表
-+ in_use_ 双向链表
++ lru_ 双向链表 只保存引用一次的
++ in_use_ 双向链表 保存引用多次的
 + table_ 哈希表
 #### 公有：
 + SetCapacity(size_t capacity) 设置缓存容量
 + Cache::Handle* Insert(const Slice& key, uint32_t hash, void* value,
                         size_t charge,
-                        void (*deleter)(const Slice& key, void* value));
-+ Cache::Handle* Lookup(const Slice& key, uint32_t hash) 查看key，返回指针
-+ void Release(Cache::Handle* handle); 释放指定的handle
-+ void Erase(const Slice& key, uint32_t hash);
-+ void Prune();
+                        void (*deleter)(const Slice& key, void* value));  插入数据
++ Cache::Handle* Lookup(const Slice& key, uint32_t hash) 查看key，返回指针（引用计数+1
++ void Release(Cache::Handle* handle); 释放指定的handle （引用计数-1
++ void Erase(const Slice& key, uint32_t hash); 删除对应的缓存
++ void Prune(); 清空 LRU
 + size_t TotalCharge() 返回usage_
+
+
+# 分片LRU缓存(ShardedLRUCache )
+## 私有成员
++ shard_ 分片LRU实例
++ id_mutex_ 保护生成新 ID 的互斥锁
++ last_id_ 最后生成的 ID
+### 静态方法
++ HashSlice 对给定的键进行哈希计算
++ Shard 根据哈希值计算该键应该放入的分片
+## 公有方法
++ 构造函数(传入容量)
++ Insert 将元素插入到相应的分片中
++ Lookup 在相应的分片中查找元素
++ Release 释放元素的引用
++ Erase 从相应的分片中删除元素
++ Value 获取元素的值
++ NewId 生成新的唯一 ID，使用互斥锁保护
++ Prune 清空所有分片中的元素
++ TotalCharge 获得总容量
+
+NewLRUCache 工厂函数 获得ShardedLRUCache 
